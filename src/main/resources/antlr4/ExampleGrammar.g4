@@ -1,4 +1,4 @@
-grammar ExpressionGrammar ;
+grammar WeridGrammar ;
 
 @header {
 package edu.ucsd.cse232b.parsers;

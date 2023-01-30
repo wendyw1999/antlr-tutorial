@@ -1,4 +1,4 @@
-// Generated from ExpressionGrammar.g4 by ANTLR 4.7.2
+// Generated from WeridGrammar.g4 by ANTLR 4.7.2
 
 package edu.ucsd.cse232b.parsers;
 

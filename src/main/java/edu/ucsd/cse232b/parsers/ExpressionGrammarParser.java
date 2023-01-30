@@ -1,4 +1,4 @@
-// Generated from ExpressionGrammar.g4 by ANTLR 4.7.2
+// Generated from WeridGrammar.g4 by ANTLR 4.7.2
 
 package edu.ucsd.cse232b.parsers;
 
@@ -75,7 +75,7 @@ public class ExpressionGrammarParser extends Parser {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "ExpressionGrammar.g4"; }
+	public String getGrammarFileName() { return "WeridGrammar.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

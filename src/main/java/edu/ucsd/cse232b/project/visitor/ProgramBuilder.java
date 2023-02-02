@@ -1,24 +1,24 @@
 package edu.ucsd.cse232b.project.visitor;
 
-
-import edu.ucsd.cse232b.project.xpath.Prog;
-import edu.ucsd.cse232b.project.xpath.Xpath;
+import edu.ucsd.cse232b.project.xpath.ProgCustom;
+import org.w3c.dom.Node;
 import edu.ucsd.cse232b.project.xpathParsers.xpathBaseVisitor;
 import edu.ucsd.cse232b.project.xpathParsers.xpathParser;
-import java.util.ArrayList;
-import java.util.List;
 
-public class ProgramBuilder extends xpathBaseVisitor<Prog> {
+import java.util.LinkedList;
+
+public class ProgramBuilder extends xpathBaseVisitor<ProgCustom> {
     @Override
-    public Prog visitProg(xpathParser.ProgContext ctx){
-        final List<Xpath> xpathList = new ArrayList<>();
+    public ProgCustom visitProg(xpathParser.ProgContext ctx){
+        LinkedList<Node> nodeList = new LinkedList<>();
         final XpathBuilder xpathBuilder = new XpathBuilder();
 
         for (xpathParser.XpathContext context: ctx.xpath()) {
-            final Xpath xpath = xpathBuilder.visit(context);
-            xpathList.add(xpath);
+            final LinkedList<Node> nodes = xpathBuilder.visit(context);
+            nodeList = nodes;
+            System.out.println(nodes);
         }
-        final Prog prog = new Prog(xpathList);
+        final ProgCustom prog = new ProgCustom(nodeList);
         return prog;
     }
 }

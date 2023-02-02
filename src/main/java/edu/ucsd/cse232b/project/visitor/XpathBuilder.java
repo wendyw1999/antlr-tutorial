@@ -19,41 +19,99 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import org.w3c.dom.Node;
 
-public class XpathBuilder extends xpathBaseVisitor<Xpath> {
+import static org.antlr.v4.runtime.tree.Trees.getDescendants;
 
+public class XpathBuilder extends xpathBaseVisitor<LinkedList> {
+    LinkedList<Node> currentNodes = new LinkedList<Node>();
+    Document inputDoc= null;
+
+
+    public void setCurrentNodes(LinkedList<Node> Nodes){
+        currentNodes = Nodes;
+    }
+
+    public LinkedList<Node> visitDoc(String fileName) {
+        File xmlFile = new File(fileName);
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setIgnoringElementContentWhitespace(true);
+        LinkedList<Node> results = new LinkedList<>();
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(xmlFile);
+
+            doc.getDocumentElement().normalize();
+            inputDoc = doc;
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+        }
+        results.add(inputDoc);
+        currentNodes = results;
+        return results;
+
+    }
     @Override
-    public Xpath visitChildRoot(xpathParser.ChildRootContext ctx) {
-        final String fileName = ctx.fileName().getText();
-        final Xpath rp = visit(ctx.rp());
-//        try {
-//            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-//
-//            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-//
-//            // parse XML file
-//            DocumentBuilder db = dbf.newDocumentBuilder();
-//
-//            Document doc = db.parse(new File(fileName));
-//            doc.getDocumentElement().normalize();
-//        } catch (ParserConfigurationException | SAXException | IOException e) {
-//            e.printStackTrace();
-//        }
+    public LinkedList<Node> visitChildRoot(xpathParser.ChildRootContext ctx) {
 
-        return new ChildRoot(rp,fileName);
+       visitDoc(ctx.fileName().getText());
+       return visit(ctx.rp());
     }
 
     @Override
-    public Xpath visitDescRoot(xpathParser.DescRootContext ctx) {
-        final String fileName = ctx.fileName().getText();
-        final Xpath rp = visit(ctx.rp());
-        return new DescRoot(rp,fileName);
+    public LinkedList<Node> visitDescRoot(xpathParser.DescRootContext ctx) {
+        visitDoc(ctx.fileName().getText());
+        LinkedList<Node> descendants = getDescendants(currentNodes);
+        currentNodes.addAll(descendants);
+        return visit(ctx.rp());
     }
 
     @Override
-    public Xpath visitTAG_NAME(xpathParser.TAG_NAMEContext ctx) {
-        final TagName tagName = new TagName(ctx.ID().getText());
-        return tagName;
+    public LinkedList<Node> visitTAG_NAME(xpathParser.TAG_NAMEContext ctx) {
+        LinkedList<Node> results = new LinkedList<>();
+        LinkedList<Node>  childrenList =  getChildren(currentNodes);
+        for (Node child: childrenList)
+            if(child.getNodeType() == Node.ELEMENT_NODE && child.getNodeName().equals(ctx.getText()))
+                results.add(child);
+        currentNodes = results;
+        return results;
     }
+    public static LinkedList<Node> getChildren(LinkedList<Node> n){
+        /**
+         * return the children of the a node (just the next level)
+         */
+        LinkedList<Node> childrenList = new LinkedList<Node>();
+        for(int j = 0; j < n.size(); j++) {
+            Node curNode = n.get(j);
+            for (int i = 0; i < curNode.getChildNodes().getLength(); i++) {
+                childrenList.add(curNode.getChildNodes().item(i));
+            }
+        }
+        return childrenList;
+    }
+
+
+    public LinkedList<Node> getAllNodes(Node n) {
+        LinkedList<Node> allNodes = new LinkedList<Node>();
+        for(int i = 0; i < n.getChildNodes().getLength(); i++) {
+            allNodes.addAll( getAllNodes( n.getChildNodes().item(i) ) );
+        }
+        allNodes.add(n);
+        return allNodes;
+    }
+
+    public LinkedList<Node> getDescendants(LinkedList<Node> list) {
+        LinkedList<Node> desc = new LinkedList<Node>();
+        for(int i = 0; i < list.size(); i++) {
+            if(list.get(i).getChildNodes().getLength() != 0) {
+                for(int j = 0; j < list.get(i).getChildNodes().getLength(); j++) {
+                    desc.addAll(getAllNodes(list.get(i).getChildNodes().item(j)));
+                }
+            }
+        }
+        return desc;
+    }
+
 }
 

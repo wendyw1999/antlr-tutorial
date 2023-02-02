@@ -71,6 +71,7 @@ public class ExpressionBuilder extends ExpressionGrammarBaseListener {
     public void exitExpr_Parentheses(Expr_ParenthesesContext ctx){
         final Expression expression = (Expression) retrieveObject(ctx.exp());
         final ParaExpression paraExpression = new ParaExpression(expression);
+        System.out.println(expression);
         setObject(ctx,paraExpression);
     }
     @Override

@@ -7,48 +7,45 @@ grammar xpath;
  */
 
 @header {
-package edu.ucsd.cse232b.parsers;
+package edu.ucsd.cse232b.project.xpathParsers;
 }
 
 /*Rules*/
-prog :	xpath EOF;
+prog :	(xpath)+ EOF;
 
-xpath: ap
+
+
+xpath :
+DOC LPR fileName RPR SLASH rp       #ChildRoot //1
+|DOC LPR fileName RPR DOUBLESLASH rp   #DescRoot  //2
 ;
-
-ap :
-DOC LPR fileName RPR SLASH rp            #ChildRoot //1
-|DOC LPR fileName RPR DOUBLESLASH rp     #DescRoot  //2
-;
-
+//
 rp:
-tagname     #TagName    //3
-| '*'       #Star   //4
-| '.'       #SelfAxis   //5
-| '..'       #ParentAxis        //6
-| TXT LPR RPR #TextAxis //7
-| attname #AttrAxis //8
-| LPR rp LPR #Parenthesis   //9
-| rp SLASH rp #ChildRp  //10
-| rp DOUBLESLASH rp #DescRp //11
-| rp LB filter RB #FilterRp //12
-| rp COMMA rp #TwoRp //13
+ID     #TAG_NAME    //3
+| '*'       #STAR   //4
+| '.'       #SELF_AXIS   //5
+| '..'       #PARENT_AXIS        //6
+| TXT LPR RPR #TEXT_AXIS //7
+| attname #ATTR_AXIS //8
+| LPR rp LPR #PARENTHESIS   //9
+| rp SLASH rp #CHILD_RP  //10
+| rp DOUBLESLASH rp #DESC_RP //11
+| rp LB filter RB #FILTER_RP //12
+| rp COMMA rp #TWO_RP //13
 ;
 
 filter:
-rp          #FilterExist  //14
-| rp '=' rp  #FilterEq  //15
-| rp '==' rp #FilterIs  //16
-| rp '=' STRING #FilterEqString //17
-| LPR filter RPR #FilterParent  //18
-| filter 'and' filter #FilterAnd    //19
-| filter 'or' filter #FilterOr  //20
-| 'not' filter      #FilterNot  //21
+rp          #FILTEER_EXIST  //14
+| rp '=' rp  #FILTER_EQ  //15
+| rp '==' rp #FILTER_IS  //16
+| rp '=' STRING #FILTER_EQ_STRING //17
+| LPR filter RPR #FILTER_PARENT  //18
+| filter 'and' filter #FILTER_AND    //19
+| filter 'or' filter #FILTER_OR  //20
+| 'not' filter      #FILTERNOT  //21
 ;
 
-fileName: ID '.xml'    #Xml_File
-;
-tagname: ID;
+fileName: ID'.xml';
 
 attname: '@' ID;
 
@@ -71,4 +68,4 @@ LPR: '(';
 RPR: ')';
 
 STAR: '*';
-STRING: [0-9a-zA-Z]*;
+STRING: [0-9a-zA-Z]+;

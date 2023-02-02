@@ -46,7 +46,7 @@
                 </executions>
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/resources/antlr4</sourceDirectory>
-                    <outputDirectory>${basedir}/src/main/java/edu/ucsd/cse232b/parsers</outputDirectory>
+                    <outputDirectory>${basedir}/src/main/java/edu/ucsd/cse232b/project/xpathParsers</outputDirectory>
                     <visitor>true</visitor>
                 </configuration>
             </plugin>

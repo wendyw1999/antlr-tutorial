@@ -10,7 +10,7 @@ import edu.ucsd.cse232b.antlrTutorial.expression.Prog;
 
 public class main {
      public static void main(String[] args) {
-         final String expression = "(A+B)*C";
+         final String expression = "2+3";
 
          final ExpressionGrammarLexer lexer = new ExpressionGrammarLexer(CharStreams.fromString(expression));
          final CommonTokenStream tokens = new CommonTokenStream(lexer);

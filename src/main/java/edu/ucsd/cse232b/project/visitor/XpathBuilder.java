@@ -77,6 +77,29 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList> {
         currentNodes = results;
         return results;
     }
+
+    @Override
+    public LinkedList<Node> visitSTAR(xpathParser.STARContext ctx) {
+        LinkedList<Node> results = new LinkedList<>();
+        LinkedList<Node>  childrenList =  getChildren(currentNodes);
+        for (Node child: childrenList)
+            if(child.getNodeType() == Node.ELEMENT_NODE)
+                results.add(child);
+        currentNodes = results;
+        return results;
+    }
+
+    @Override
+    public LinkedList<Node> visitSELF_AXIS(xpathParser.SELF_AXISContext ctx) {
+        return currentNodes;
+    }
+
+    @Override
+    public LinkedList<Node> visitPARENT_AXIS(xpathParser.PARENT_AXISContext ctx) {
+        currentNodes = getParents(currentNodes);
+        LinkedList<Node> results = currentNodes;
+        return results;
+    }
     public static LinkedList<Node> getChildren(LinkedList<Node> n){
         /**
          * return the children of the a node (just the next level)
@@ -111,6 +134,16 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList> {
             }
         }
         return desc;
+    }
+    public LinkedList<Node> getParents(LinkedList<Node> input) {
+        LinkedList<Node> res = new LinkedList<>();
+        for(int i = 0; i < input.size(); i++) {
+            Node parentNode = input.get(i).getParentNode();
+            if(!res.contains(parentNode)) {
+                res.add(parentNode);
+            }
+        }
+        return res;
     }
 
 }

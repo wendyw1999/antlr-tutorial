@@ -9,7 +9,15 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.util.LinkedList;
 
 
 public class main {
@@ -22,8 +30,5 @@ public class main {
         final ParseTreeWalker walker = new ParseTreeWalker();
         final XpathBuilder xpathBuilder = new XpathBuilder();
         walker.walk(xpathBuilder, tree);
-        final Prog xpathObjects = xpathBuilder.getProg(tree);
-        System.out.println(xpathObjects);
-
     }
 }

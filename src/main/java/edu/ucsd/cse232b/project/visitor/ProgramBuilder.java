@@ -16,7 +16,6 @@ public class ProgramBuilder extends xpathBaseVisitor<ProgCustom> {
         for (xpathParser.XpathContext context: ctx.xpath()) {
             final LinkedList<Node> nodes = xpathBuilder.visit(context);
             nodeList = nodes;
-            System.out.println(nodes);
         }
         final ProgCustom prog = new ProgCustom(nodeList);
         return prog;

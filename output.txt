@@ -1,0 +1,32 @@
+<RESULT>
+<ACT>
+<TITLE>ACT I</TITLE>
+<SCENE>
+<TITLE>SCENE I. Rome. A street.</TITLE>
+<STAGEDIR>Enter FLAVIUS, MARULLUS, and certain Commoners</STAGEDIR>
+<SPEECH>
+<SPEAKER>FLAVIUS</SPEAKER>
+<LINE>Hence! home, you idle creatures get you home:</LINE>
+<LINE>Is this a holiday? what! know you not,</LINE>
+<LINE>Being mechanical, you ought not walk</LINE>
+<LINE>Upon a labouring day without the sign</LINE>
+<LINE>Of your profession? Speak, what trade art thou?</LINE>
+</SPEECH>
+<SPEECH>
+<SPEAKER>First Commoner</SPEAKER>
+<LINE>Why, sir, a carpenter.</LINE>
+</SPEECH>
+<SPEECH>
+<SPEAKER>MARULLUS</SPEAKER>
+<LINE>Where is thy leather apron and thy rule?</LINE>
+<LINE>What dost thou with thy best apparel on?</LINE>
+<LINE>You, sir, what trade are you?</LINE>
+</SPEECH>
+<SPEECH>
+<SPEAKER>MARULLUS</SPEAKER>
+<LINE>But what trade art thou? answer me directly.</LINE>
+</SPEECH>
+<STAGEDIR>Exeunt</STAGEDIR>
+</SCENE>
+</ACT>
+</RESULT>

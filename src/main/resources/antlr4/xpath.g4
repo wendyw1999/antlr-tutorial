@@ -16,8 +16,8 @@ prog :	(xpath)+ EOF;
 
 
 xpath :
-DOC LPR fileName RPR SLASH rp       #ChildRoot //1
-|DOC LPR fileName RPR DOUBLESLASH rp   #DescRoot  //2
+DOC LPR QUOTE fileName QUOTE RPR SLASH rp       #ChildRoot //1
+|DOC LPR QUOTE fileName QUOTE RPR DOUBLESLASH rp   #DescRoot  //2
 ;
 //
 rp:
@@ -52,7 +52,7 @@ attname: '@' ID;
 /*Tokens*/
 
 
-
+QUOTE: '"';
 DOC: 'doc';
 TXT:'text';
 LB: '[';

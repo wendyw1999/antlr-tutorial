@@ -1,6 +1,5 @@
 package edu.ucsd.cse232b.project.visitor;
 
-import edu.ucsd.cse232b.project.xpath.Prog;
 import edu.ucsd.cse232b.project.xpath.ProgCustom;
 import edu.ucsd.cse232b.project.xpathParsers.xpathLexer;
 import edu.ucsd.cse232b.project.xpathParsers.xpathParser;
@@ -13,23 +12,22 @@ import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class main {
+public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        String outPath = "output.txt";
-        String inputPath = "input.txt";
+        String inputPath = args[0];
+
+        String outPath = args[1];
         PrintWriter writer = new PrintWriter(outPath);
         writer.print("");
         writer.close();

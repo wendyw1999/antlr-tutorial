@@ -1,5 +1,4 @@
-// Generated from xpath.g4 by ANTLR 4.7.2
-
+// Generated from java-escape by ANTLR 4.11.1
 package edu.ucsd.cse232b.project.xpathParsers;
 
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
@@ -12,6 +11,7 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * @param <T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
+@SuppressWarnings("CheckReturnValue")
 public class xpathBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements xpathVisitor<T> {
 	/**
 	 * {@inheritDoc}
@@ -117,13 +117,6 @@ public class xpathBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitFILTEER_EXIST(xpathParser.FILTEER_EXISTContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitFILTERNOT(xpathParser.FILTERNOTContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -160,6 +153,13 @@ public class xpathBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitFILTER_EQ(xpathParser.FILTER_EQContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitFILTER_EXIST(xpathParser.FILTER_EXISTContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

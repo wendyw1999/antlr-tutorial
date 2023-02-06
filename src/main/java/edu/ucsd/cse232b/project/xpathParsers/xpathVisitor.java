@@ -1,5 +1,4 @@
-// Generated from xpath.g4 by ANTLR 4.7.2
-
+// Generated from java-escape by ANTLR 4.11.1
 package edu.ucsd.cse232b.project.xpathParsers;
 
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
@@ -110,13 +109,6 @@ public interface xpathVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTAG_NAME(xpathParser.TAG_NAMEContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code FILTEER_EXIST}
-	 * labeled alternative in {@link xpathParser#filter}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFILTEER_EXIST(xpathParser.FILTEER_EXISTContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code FILTERNOT}
 	 * labeled alternative in {@link xpathParser#filter}.
 	 * @param ctx the parse tree
@@ -158,6 +150,13 @@ public interface xpathVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFILTER_EQ(xpathParser.FILTER_EQContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FILTER_EXIST}
+	 * labeled alternative in {@link xpathParser#filter}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFILTER_EXIST(xpathParser.FILTER_EXISTContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code FILTER_IS}
 	 * labeled alternative in {@link xpathParser#filter}.

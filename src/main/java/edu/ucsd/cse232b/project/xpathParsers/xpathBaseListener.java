@@ -1,5 +1,4 @@
-// Generated from xpath.g4 by ANTLR 4.7.2
-
+// Generated from java-escape by ANTLR 4.11.1
 package edu.ucsd.cse232b.project.xpathParsers;
 
 
@@ -12,6 +11,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
+@SuppressWarnings("CheckReturnValue")
 public class xpathBaseListener implements xpathListener {
 	/**
 	 * {@inheritDoc}
@@ -186,18 +186,6 @@ public class xpathBaseListener implements xpathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFILTEER_EXIST(xpathParser.FILTEER_EXISTContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitFILTEER_EXIST(xpathParser.FILTEER_EXISTContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterFILTERNOT(xpathParser.FILTERNOTContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -265,6 +253,18 @@ public class xpathBaseListener implements xpathListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFILTER_EQ(xpathParser.FILTER_EQContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFILTER_EXIST(xpathParser.FILTER_EXISTContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFILTER_EXIST(xpathParser.FILTER_EXISTContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

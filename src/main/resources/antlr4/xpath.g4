@@ -35,9 +35,9 @@ ID     #TAG_NAME    //3
 ;
 
 filter:
-rp          #FILTEER_EXIST  //14
-| rp '=' rp  #FILTER_EQ  //15
-| rp '==' rp #FILTER_IS  //16
+rp          #FILTER_EXIST  //14
+| rp ('=' | 'eq') rp  #FILTER_EQ  //15
+| rp ('==' | 'is') rp #FILTER_IS  //16
 | rp '=' STRING #FILTER_EQ_STRING //17
 | LPR filter RPR #FILTER_PARENT  //18
 | filter 'and' filter #FILTER_AND    //19
@@ -52,7 +52,7 @@ attname: '@' ID;
 /*Tokens*/
 
 
-QUOTE: '"';
+QUOTE: ["|'];
 DOC: 'doc';
 TXT:'text';
 LB: '[';
@@ -68,4 +68,7 @@ LPR: '(';
 RPR: ')';
 
 STAR: '*';
-STRING: [0-9a-zA-Z]+;
+STRING: QUOTE [0-9a-zA-Z]+ QUOTE;
+
+// ignore whitespace
+Whitespace: [ \t\n\r]+ -> skip;

@@ -32,12 +32,12 @@ public class Main {
         writer.print("");
         writer.close();
         ArrayList<String> inputFile = readFile(inputPath);
-        for (int i=0;i<inputFile.size();i++) {
+        for (int i = 0;i<inputFile.size();i++) {
             evalXpath(inputFile.get(i),outPath);
         }
     }
 
-    public static void evalXpath(String xpathString,String outPath) {
+    public static void evalXpath(String xpathString, String outPath) {
         final xpathLexer lexer = new xpathLexer(CharStreams.fromString(xpathString));
         final CommonTokenStream tokens = new CommonTokenStream(lexer);
         final xpathParser parser = new xpathParser(tokens);
@@ -45,7 +45,7 @@ public class Main {
         final ProgramBuilder programBuilder = new ProgramBuilder(); //todo
         final ProgCustom program = programBuilder.visit(tree);
         final LinkedList<Node> resultList = program.getNodeList();
-        writeToFile(resultList,outPath);
+        writeToFile(resultList, outPath);
 
     }
     public static void writeToFile(LinkedList<Node> res, String filePath) {
@@ -57,7 +57,7 @@ public class Main {
             Document newDoc = domBuilder.newDocument();
             Element rootElement = newDoc.createElement("RESULT");
             for (int i = 0; i < res.size(); i++) {
-                Node resultNode =newDoc.importNode(res.get(i),true);
+                Node resultNode = newDoc.importNode(res.get(i),true);
                 rootElement.appendChild(resultNode);
             }
             String toWrite = toString(rootElement);

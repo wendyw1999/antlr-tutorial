@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import org.w3c.dom.Node;
 
 import static org.antlr.v4.runtime.tree.Trees.getDescendants;
+import static org.antlr.v4.runtime.tree.Trees.findAllNodes;
 
 public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
     LinkedList<Node> currentNodes = new LinkedList<Node>();
@@ -67,15 +68,8 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
         visitDoc(ctx.fileName().getText());
         LinkedList<Node> result = new LinkedList<>(currentNodes);
         result.addAll(getChildren(currentNodes));
-        LinkedList<Node> descNodes = getChildren(currentNodes);
-        while (!descNodes.isEmpty()) {
-            Node node = descNodes.poll();
-            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-                descNodes.add(node.getChildNodes().item(i));
-                result.add(node.getChildNodes().item(i));
-            }
-        }
-        currentNodes = result;
+        LinkedList<Node> selfOrDesc = getAllNodes(currentNodes);
+        currentNodes = selfOrDesc;
         return visit(ctx.rp());
     }
 
@@ -189,17 +183,10 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
     @Override
     public LinkedList<Node> visitDESC_RP(xpathParser.DESC_RPContext ctx) {
         visit(ctx.rp(0));
-        LinkedList<Node> result = new LinkedList<>(currentNodes);
-        result.addAll(getChildren(currentNodes));
-        LinkedList<Node> descNodes = getChildren(currentNodes);
-        while (!descNodes.isEmpty()) {
-            Node node = descNodes.poll();
-            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-                descNodes.add(node.getChildNodes().item(i));
-                result.add(node.getChildNodes().item(i));
-            }
-        }
-        currentNodes = result;
+//        LinkedList<Node> result = new LinkedList<>(currentNodes);
+//        result.addAll(getChildren(currentNodes));
+        LinkedList<Node> selfOrDesc = getAllNodes(currentNodes);
+        currentNodes = selfOrDesc;
         return visit(ctx.rp(1));
     }
 
@@ -395,26 +382,40 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
     }
 
 
-    public LinkedList<Node> getAllNodes(Node n) {
-        LinkedList<Node> allNodes = new LinkedList<Node>();
-        for(int i = 0; i < n.getChildNodes().getLength(); i++) {
-            allNodes.addAll( getAllNodes( n.getChildNodes().item(i) ) );
-        }
-        allNodes.add(n);
-        return allNodes;
-    }
+//    public LinkedList<Node> getAllNodes(Node n) {
+//        LinkedList<Node> allNodes = new LinkedList<Node>();
+//        for(int i = 0; i < n.getChildNodes().getLength(); i++) {
+//            allNodes.addAll( getAllNodes( n.getChildNodes().item(i) ) );
+//        }
+//        allNodes.add(n);
+//        return allNodes;
+//    }
 
-    public LinkedList<Node> getDescendants(LinkedList<Node> list) {
-        LinkedList<Node> desc = new LinkedList<>();
-        for(int i = 0; i < list.size(); i++) {
-            if(list.get(i).getChildNodes().getLength() != 0) {
-                for(int j = 0; j < list.get(i).getChildNodes().getLength(); j++) {
-                    desc.addAll(getAllNodes(list.get(i).getChildNodes().item(j)));
-                }
+    public LinkedList<Node> getAllNodes(LinkedList<Node> list) {
+        LinkedList<Node> all = new LinkedList<>(list);
+        LinkedList<Node> temp = new LinkedList<>(list);
+        while (!temp.isEmpty()) {
+            Node node = temp.poll();
+            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                all.add(node.getChildNodes().item(i));
+                temp.add(node.getChildNodes().item(i));
             }
         }
-        return desc;
+        return all;
     }
+
+//    public LinkedList<Node> getDescendants(LinkedList<Node> list) {
+//        LinkedList<Node> desc = new LinkedList<>();
+//        for(int i = 0; i < list.size(); i++) {
+//            if(list.get(i).getChildNodes().getLength() != 0) {
+//                for(int j = 0; j < list.get(i).getChildNodes().getLength(); j++) {
+//                    desc.addAll(getAllNodes(list.get(i).getChildNodes().item(j)));
+//                }
+//            }
+//        }
+//        return desc;
+//    }
+
     public LinkedList<Node> getParents(LinkedList<Node> input) {
         LinkedList<Node> res = new LinkedList<>();
         for(int i = 0; i < input.size(); i++) {

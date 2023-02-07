@@ -179,14 +179,17 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitDESC_RP(xpathParser.DESC_RPContext ctx) {
-        for (Node node : getDescendants(visit(ctx.rp(0)))) {
+        visit(ctx.rp(0));
+        HashSet<Node> temp = new HashSet<>();
+        LinkedList<Node> descNodes = getDescendants(currentNodes);
+        for (Node node : descNodes) {
+            currentNodes = new LinkedList<>();
             currentNodes.add(node);
+            temp.addAll(visit(ctx.rp(1)));
         }
-        HashSet<Node> set = new HashSet<>();
-        set.addAll(visit(ctx.rp(1)));
-        LinkedList<Node> result = new LinkedList<Node>(set);
+        LinkedList<Node> result = new LinkedList<>(temp);
         currentNodes = result;
-        return currentNodes;
+        return result;
     }
 
     /**
@@ -215,8 +218,11 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitTWO_RP(xpathParser.TWO_RPContext ctx) {
+        LinkedList<Node> temp = new LinkedList<>(currentNodes);
         LinkedList<Node> result = visit(ctx.rp(0));
+        currentNodes = temp;
         result.addAll(visit(ctx.rp(1)));
+        result = new LinkedList<>(new HashSet<>(result));
         currentNodes = result;
         return result;
     }
@@ -248,8 +254,13 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitFILTER_EQ(xpathParser.FILTER_EQContext ctx) {
-        for (Node n1 : visit(ctx.rp(0))) {
-            for (Node n2 : visit(ctx.rp(1))) {
+        LinkedList<Node> temp = new LinkedList<>(currentNodes);
+        LinkedList<Node> nodes1 = visit(ctx.rp(0));
+        currentNodes = new LinkedList<>(temp);
+        LinkedList<Node> nodes2 = visit(ctx.rp(1));
+        currentNodes = new LinkedList<>(temp);
+        for (Node n1 : nodes1) {
+            for (Node n2 : nodes2) {
                 if (n1.isEqualNode(n2)) return currentNodes;
             }
         }
@@ -316,9 +327,11 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitFILTER_AND(xpathParser.FILTER_ANDContext ctx) {
+        LinkedList<Node> temp = new LinkedList<>(currentNodes);
         LinkedList<Node> result = visit(ctx.filter(0));
+        currentNodes = temp;
         result.retainAll(visit(ctx.filter(1)));
-        currentNodes = result;
+        currentNodes = new LinkedList<>(result);
         return result;
     }
 
@@ -336,11 +349,17 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
         return result;
     }
 
+    /**
+     * Rule #21
+     * @param ctx
+     * @return the not operation set of query of the context node
+     */
     @Override
     public LinkedList<Node> visitFILTERNOT(xpathParser.FILTERNOTContext ctx) {
+        LinkedList<Node> temp = new LinkedList<>(currentNodes);
         LinkedList<Node> result = new LinkedList<>();
-        for (int i = 0; i < currentNodes.size(); i++) {
-            Node node = currentNodes.get(i);
+        for (int i = 0; i < temp.size(); i++) {
+            Node node = temp.get(i);
             currentNodes = new LinkedList<>();
             currentNodes.add(node);
             if (visit(ctx.filter()).isEmpty()) result.add(node);

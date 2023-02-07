@@ -1,4 +1,5 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from xpath.g4 by ANTLR 4.7.2
+
 package edu.ucsd.cse232b.project.xpathParsers;
 
 
@@ -11,7 +12,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-@SuppressWarnings("CheckReturnValue")
 public class xpathBaseListener implements xpathListener {
 	/**
 	 * {@inheritDoc}

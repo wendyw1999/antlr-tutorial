@@ -1,4 +1,5 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from xpath.g4 by ANTLR 4.7.2
+
 package edu.ucsd.cse232b.project.xpathParsers;
 
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
@@ -11,7 +12,6 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * @param <T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-@SuppressWarnings("CheckReturnValue")
 public class xpathBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements xpathVisitor<T> {
 	/**
 	 * {@inheritDoc}

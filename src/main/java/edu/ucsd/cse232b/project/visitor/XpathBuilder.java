@@ -215,10 +215,17 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitTWO_RP(xpathParser.TWO_RPContext ctx) {
-        LinkedList<Node> result = visit(ctx.rp(0));
-        result.addAll(visit(ctx.rp(1)));
-        currentNodes = result;
-        return result;
+        LinkedList<Node> results;
+        LinkedList<Node> prevNodes = currentNodes;
+        visit(ctx.rp(0));
+        LinkedList<Node> resultsFirst = currentNodes;
+        currentNodes = prevNodes;
+        visit(ctx.rp(1));
+        LinkedList<Node> resultsSecond = currentNodes;
+        resultsFirst.addAll(resultsSecond);
+        results = resultsFirst;
+        currentNodes = results;
+        return results;
     }
 
     /**

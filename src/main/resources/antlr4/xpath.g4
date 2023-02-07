@@ -27,7 +27,7 @@ ID     #TAG_NAME    //3
 | '..'       #PARENT_AXIS        //6
 | TXT LPR RPR #TEXT_AXIS //7
 | attname #ATTR_AXIS //8
-| LPR rp LPR #PARENTHESIS   //9
+| LPR rp RPR #PARENTHESIS   //9
 | rp SLASH rp #CHILD_RP  //10
 | rp DOUBLESLASH rp #DESC_RP //11
 | rp LB filter RB #FILTER_RP //12

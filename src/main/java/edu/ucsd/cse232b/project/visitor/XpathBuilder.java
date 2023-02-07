@@ -1,33 +1,19 @@
 package edu.ucsd.cse232b.project.visitor;
 
-import com.sun.javafx.css.converters.DurationConverter;
-import com.sun.scenario.effect.impl.state.LinearConvolveKernel;
-import edu.ucsd.cse232b.antlrTutorial.expression.*;
-import edu.ucsd.cse232b.parsers.ExpressionGrammarBaseVisitor;
-import edu.ucsd.cse232b.parsers.ExpressionGrammarParser;
-import edu.ucsd.cse232b.project.xpath.ChildRoot;
-import edu.ucsd.cse232b.project.xpath.DescRoot;
-import edu.ucsd.cse232b.project.xpath.TagName;
-import edu.ucsd.cse232b.project.xpath.Xpath;
 import edu.ucsd.cse232b.project.xpathParsers.xpathBaseVisitor;
 import edu.ucsd.cse232b.project.xpathParsers.xpathParser;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.xpath.XPathEvaluator;
+
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import org.w3c.dom.Node;
-import sun.awt.image.ImageWatched;
 
 import static org.antlr.v4.runtime.tree.Trees.getDescendants;
 
@@ -210,13 +196,16 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitFILTER_RP(xpathParser.FILTER_RPContext ctx) {
-        LinkedList<Node> temp = visit(ctx.rp());
-        LinkedList<Node> result = new LinkedList<>();
-        for (Node node : currentNodes) {
-            if (!visit(ctx.filter()).isEmpty()) result.add(node);
-        }
-        currentNodes = result;
-        return result;
+//        LinkedList<Node> temp = visit(ctx.rp());
+//        LinkedList<Node> result = new LinkedList<>();
+//        for (Node node : currentNodes) {
+//            if (!visit(ctx.filter()).isEmpty()) result.add(node);
+//        }
+//        currentNodes = result;
+//        return result;
+        visit(ctx.rp());
+        currentNodes = visit(ctx.filter());
+        return currentNodes;
     }
 
     /**
@@ -239,9 +228,17 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitFILTER_EXIST(xpathParser.FILTER_EXISTContext ctx) {
-        LinkedList<Node> result = visit(ctx.rp());
-        currentNodes = result;
-        return result;
+        LinkedList<Node> keepCurrent = currentNodes;
+        LinkedList<Node> results = new LinkedList<>();
+        for (Node node : keepCurrent){
+            LinkedList<Node> newCurrent = new LinkedList<>();
+            newCurrent.add(node);
+            currentNodes = newCurrent;
+            if (visit(ctx.rp()).size() > 0)
+                results.add(node);
+        }
+        currentNodes = results;
+        return results;
     }
 
     /**
@@ -266,12 +263,23 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitFILTER_IS(xpathParser.FILTER_ISContext ctx) {
-        for (Node n1 : visit(ctx.rp(0))) {
-            for (Node n2 : visit(ctx.rp(1))) {
-                if (n1 == n2) return currentNodes;
-            }
+        LinkedList<Node> keepCurrent = currentNodes;
+        LinkedList<Node> results = new LinkedList<>();
+
+        for (Node node : keepCurrent){
+            LinkedList<Node> singleCurrent = new LinkedList<>();
+            singleCurrent.add(node);
+            currentNodes = singleCurrent;
+            LinkedList<Node> leftList = visit(ctx.rp(0));
+            currentNodes = singleCurrent;
+            LinkedList<Node> rightList = visit(ctx.rp(1));
+            for (Node left : leftList)
+                for (Node right: rightList)
+                    if (left.isSameNode(right) && !results.contains(node))
+                        results.add(node);
         }
-        return new LinkedList<>();
+        currentNodes = results;
+        return results;
     }
 
     /**

@@ -1,6 +1,1 @@
-<RESULT>
-<TITLE>Dramatis Personae</TITLE>
-<TITLE>SCENE I. Rome. A street.</TITLE>
-<TITLE>ACT I</TITLE>
-<TITLE>The Tragedy of Julius Caesar</TITLE>
-</RESULT>
+<RESULT/>

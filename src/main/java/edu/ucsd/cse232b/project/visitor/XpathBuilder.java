@@ -194,6 +194,7 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitFILTER_RP(xpathParser.FILTER_RPContext ctx) {
+        visit(ctx.rp());
         LinkedList<Node> temp = new LinkedList<>(currentNodes);
         LinkedList<Node> result = new LinkedList<>();
         for (Node node : temp) {

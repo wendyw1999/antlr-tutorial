@@ -12,12 +12,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import org.w3c.dom.Node;
 
 import static org.antlr.v4.runtime.tree.Trees.getDescendants;
-import static org.antlr.v4.runtime.tree.Trees.findAllNodes;
 
 public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
     LinkedList<Node> currentNodes = new LinkedList<Node>();
@@ -55,8 +53,8 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
     @Override
     public LinkedList<Node> visitChildRoot(xpathParser.ChildRootContext ctx) {
 
-       visitDoc(ctx.fileName().getText());
-       return visit(ctx.rp());
+        visitDoc(ctx.fileName().getText());
+        return visit(ctx.rp());
     }
 
     /**
@@ -65,11 +63,10 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitDescRoot(xpathParser.DescRootContext ctx) {
+
         visitDoc(ctx.fileName().getText());
-        LinkedList<Node> result = new LinkedList<>(currentNodes);
-        result.addAll(getChildren(currentNodes));
-        LinkedList<Node> selfOrDesc = getAllNodes(currentNodes);
-        currentNodes = selfOrDesc;
+        LinkedList<Node> descendants = getDescendants(currentNodes);
+        currentNodes.addAll(descendants);
         return visit(ctx.rp());
     }
 
@@ -120,6 +117,7 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitPARENT_AXIS(xpathParser.PARENT_AXISContext ctx) {
+
         currentNodes = getParents(currentNodes);
         return currentNodes;
     }
@@ -182,12 +180,13 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitDESC_RP(xpathParser.DESC_RPContext ctx) {
-        visit(ctx.rp(0));
-//        LinkedList<Node> result = new LinkedList<>(currentNodes);
-//        result.addAll(getChildren(currentNodes));
-        LinkedList<Node> selfOrDesc = getAllNodes(currentNodes);
-        currentNodes = selfOrDesc;
-        return visit(ctx.rp(1));
+        for (Node node : getDescendants(visit(ctx.rp(0)))) {
+            currentNodes.add(node);
+        }
+
+        LinkedList<Node> result = visit(ctx.rp(1));
+        currentNodes = result;
+        return currentNodes;
     }
 
     /**
@@ -216,13 +215,17 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitTWO_RP(xpathParser.TWO_RPContext ctx) {
-        LinkedList<Node> temp = new LinkedList<>(currentNodes);
-        LinkedList<Node> result = visit(ctx.rp(0));
-        currentNodes = temp;
-        result.addAll(visit(ctx.rp(1)));
-        result = new LinkedList<>(new HashSet<>(result));
-        currentNodes = result;
-        return result;
+        LinkedList<Node> results;
+        LinkedList<Node> prevNodes = currentNodes;
+        visit(ctx.rp(0));
+        LinkedList<Node> resultsFirst = currentNodes;
+        currentNodes = prevNodes;
+        visit(ctx.rp(1));
+        LinkedList<Node> resultsSecond = currentNodes;
+        resultsFirst.addAll(resultsSecond);
+        results = resultsFirst;
+        currentNodes = results;
+        return results;
     }
 
     /**
@@ -252,13 +255,8 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitFILTER_EQ(xpathParser.FILTER_EQContext ctx) {
-        LinkedList<Node> temp = new LinkedList<>(currentNodes);
-        LinkedList<Node> nodes1 = visit(ctx.rp(0));
-        currentNodes = new LinkedList<>(temp);
-        LinkedList<Node> nodes2 = visit(ctx.rp(1));
-        currentNodes = new LinkedList<>(temp);
-        for (Node n1 : nodes1) {
-            for (Node n2 : nodes2) {
+        for (Node n1 : visit(ctx.rp(0))) {
+            for (Node n2 : visit(ctx.rp(1))) {
                 if (n1.isEqualNode(n2)) return currentNodes;
             }
         }
@@ -325,11 +323,9 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
      */
     @Override
     public LinkedList<Node> visitFILTER_AND(xpathParser.FILTER_ANDContext ctx) {
-        LinkedList<Node> temp = new LinkedList<>(currentNodes);
         LinkedList<Node> result = visit(ctx.filter(0));
-        currentNodes = temp;
         result.retainAll(visit(ctx.filter(1)));
-        currentNodes = new LinkedList<>(result);
+        currentNodes = result;
         return result;
     }
 
@@ -347,17 +343,11 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
         return result;
     }
 
-    /**
-     * Rule #21
-     * @param ctx
-     * @return the not operation set of query of the context node
-     */
     @Override
     public LinkedList<Node> visitFILTERNOT(xpathParser.FILTERNOTContext ctx) {
-        LinkedList<Node> temp = new LinkedList<>(currentNodes);
         LinkedList<Node> result = new LinkedList<>();
-        for (int i = 0; i < temp.size(); i++) {
-            Node node = temp.get(i);
+        for (int i = 0; i < currentNodes.size(); i++) {
+            Node node = currentNodes.get(i);
             currentNodes = new LinkedList<>();
             currentNodes.add(node);
             if (visit(ctx.filter()).isEmpty()) result.add(node);
@@ -374,47 +364,47 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
         LinkedList<Node> childrenList = new LinkedList<Node>();
         for(int j = 0; j < n.size(); j++) {
             Node curNode = n.get(j);
-            for (int i = 0; i < curNode.getChildNodes().getLength(); i++) {
-                childrenList.add(curNode.getChildNodes().item(i));
-            }
+            childrenList.addAll(getChildren(curNode));
+        }
+        return childrenList;
+    }
+
+    public static LinkedList<Node> getChildren(Node node) {
+        LinkedList<Node> childrenList = new LinkedList<>();
+        for(int j = 0; j < node.getChildNodes().getLength(); j++) {
+            childrenList.add(node.getChildNodes().item(j));
         }
         return childrenList;
     }
 
 
-//    public LinkedList<Node> getAllNodes(Node n) {
-//        LinkedList<Node> allNodes = new LinkedList<Node>();
-//        for(int i = 0; i < n.getChildNodes().getLength(); i++) {
-//            allNodes.addAll( getAllNodes( n.getChildNodes().item(i) ) );
-//        }
-//        allNodes.add(n);
-//        return allNodes;
-//    }
-
-    public LinkedList<Node> getAllNodes(LinkedList<Node> list) {
-        LinkedList<Node> all = new LinkedList<>(list);
-        LinkedList<Node> temp = new LinkedList<>(list);
-        while (!temp.isEmpty()) {
-            Node node = temp.poll();
-            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-                all.add(node.getChildNodes().item(i));
-                temp.add(node.getChildNodes().item(i));
-            }
+    public LinkedList<Node> getAllNodes(Node n) {
+        LinkedList<Node> allNodes = new LinkedList<Node>();
+        for(int i = 0; i < n.getChildNodes().getLength(); i++) {
+            allNodes.addAll( getAllNodes( n.getChildNodes().item(i) ) );
         }
-        return all;
+        allNodes.add(n);
+        return allNodes;
     }
 
-//    public LinkedList<Node> getDescendants(LinkedList<Node> list) {
-//        LinkedList<Node> desc = new LinkedList<>();
-//        for(int i = 0; i < list.size(); i++) {
-//            if(list.get(i).getChildNodes().getLength() != 0) {
-//                for(int j = 0; j < list.get(i).getChildNodes().getLength(); j++) {
-//                    desc.addAll(getAllNodes(list.get(i).getChildNodes().item(j)));
-//                }
-//            }
-//        }
-//        return desc;
-//    }
+
+    public LinkedList<Node> getDescendants(LinkedList<Node> list) {
+        LinkedList<Node> desc = new LinkedList<>();
+        for(int i = 0; i < list.size(); i++) {
+            desc.addAll(getDescendants(list.get(i)));
+        }
+        return desc;
+    }
+
+    public LinkedList<Node> getDescendants(Node node) {
+        LinkedList<Node> desc = new LinkedList<>();
+        for (int i=0; i<node.getChildNodes().getLength(); i++) {
+            Node thisChildNode = node.getChildNodes().item(i);
+            desc.add(thisChildNode);
+            desc.addAll(getDescendants(thisChildNode));
+        }
+        return desc;
+    }
 
     public LinkedList<Node> getParents(LinkedList<Node> input) {
         LinkedList<Node> res = new LinkedList<>();
@@ -428,4 +418,3 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
     }
 
 }
-

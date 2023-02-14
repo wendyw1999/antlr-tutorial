@@ -44,7 +44,7 @@ filter:
 | filter 'or' filter #FILTER_OR  //20
 | 'not' filter      #FILTERNOT  //21
 ;
-
+// TODO: define the classes and look at programBuilder and listener update
 xq:
   var
 | STRING
@@ -54,14 +54,26 @@ xq:
 | xq SLASH rp
 | xq DOUBLESLASH rp
 | a = startTag '{' xq '}' b = endTag
-  {$a.getID().getText().equals($b.getID().getText())}
+  {$a.getID().getText().equals($b.getID().getText());}
 ;
 
-// TODO: forClause
-// TODO: letClause
-// TODO: whereClause
-// TODO: returnClause
-// TODO: cond
+forClause: 'for' var 'in' xq ( COMMA var 'in' xq )*;
+
+letClause: 'let' var ':=' xq ( COMMA var ':=' xq )*;
+
+whereClause: 'where' cond;
+
+returnClause: 'return' xq;
+
+cond:
+  xq ('=' | 'eq') xq
+| xq ('==' | 'is') xq
+| 'empty' LPR xq RPR
+| 'some' var 'in' xq (COMMA var 'in' xq)* 'satisfy' cond
+| (cond)
+| cond 'and' cond
+| cond 'or' cond
+| 'not' cond
 
 startTag: '<' ID '>';
 

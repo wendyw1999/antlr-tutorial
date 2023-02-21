@@ -1,14 +1,12 @@
-package edu.ucsd.cse232b.project.xqueryVisitor;
+package edu.ucsd.cse232b.project.xquery;
 
-import edu.ucsd.cse232b.project.visitor.ProgramBuilder;
-import edu.ucsd.cse232b.project.xpath.ProgCustom;
-import edu.ucsd.cse232b.project.xpathParsers.xpathLexer;
-import edu.ucsd.cse232b.project.xpathParsers.xpathParser;
 import edu.ucsd.cse232b.project.xqueryParsers.xqueryLexer;
 import edu.ucsd.cse232b.project.xqueryParsers.xqueryParser;
+import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -96,6 +94,28 @@ public class Main {
                 }
         );
         return arr;
+
+    }
+    public static LinkedList evalRewrited(String rewrited) {
+        try {
+            ANTLRInputStream input = new ANTLRInputStream(rewrited);
+            xqueryLexer lexer = new xqueryLexer(input);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            xqueryParser parser = new xqueryParser(tokens);
+            parser.removeErrorListeners();
+            ParseTree tree = parser.xq();
+
+            //for Visitor
+            XqueryBuilder visitor = new XqueryBuilder();
+            visitor.needRewrite = false;
+            LinkedList<Node> results = visitor.visit(tree);
+            return results;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+        }
+        return null;
 
     }
     private static String toString(Node node) {

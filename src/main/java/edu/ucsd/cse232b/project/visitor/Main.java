@@ -3,9 +3,11 @@ package edu.ucsd.cse232b.project.visitor;
 import edu.ucsd.cse232b.project.xpath.ProgCustom;
 import edu.ucsd.cse232b.project.xpathParsers.xpathLexer;
 import edu.ucsd.cse232b.project.xpathParsers.xpathParser;
+import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -95,4 +97,45 @@ public class Main {
         }
         return sw.toString();
     }
+    public static LinkedList evalAp(String ap) {
+        try {
+            ANTLRInputStream input = new ANTLRInputStream(ap);
+            xpathLexer lexer = new xpathLexer(input);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            xpathParser parser = new xpathParser(tokens);
+            parser.removeErrorListeners();
+            ParseTree tree = parser.xpath();
+
+            //for Visitor
+            XpathBuilder visitor = new XpathBuilder();
+            LinkedList<Node> results = visitor.visit(tree);
+            return results;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+        }
+        return null;
+    }
+    public static LinkedList evalRp(LinkedList<Node> currentNodes, String rp) {
+        try {
+            ANTLRInputStream input = new ANTLRInputStream(rp);
+            xpathLexer lexer = new xpathLexer(input);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            xpathParser parser = new xpathParser(tokens);
+            parser.removeErrorListeners();
+            ParseTree tree = parser.rp();
+
+            //for Visitor
+            XpathBuilder visitor = new XpathBuilder();
+            visitor.setCurrentNodes(currentNodes);
+            LinkedList<Node> results = visitor.visit(tree);
+            return results;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+        }
+        return null;
+    }
+
 }

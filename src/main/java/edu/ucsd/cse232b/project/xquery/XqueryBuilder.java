@@ -392,7 +392,7 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
                     output += "where " + cond[j][0] + " eq " + cond[j][1] +"\n";
                     System.out.println("where " + cond[j][0] + " eq " + cond[j][1]);
                 }else {
-                    output += " and  " + cond[j][0] + " eq " + cond[j][1] + "\n";
+                    output += " and " + cond[j][0] + " eq " + cond[j][1] + "\n";
                     System.out.println(" and  " + cond[j][0] + " eq " + cond[j][1]);
                 }
             }

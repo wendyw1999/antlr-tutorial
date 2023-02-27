@@ -1,20 +1,26 @@
 package edu.ucsd.cse232b.project.xquery;
 
-import edu.ucsd.cse232b.project.visitor.XpathBuilder;
+
 import edu.ucsd.cse232b.project.xqueryParsers.xqueryBaseVisitor;
 import edu.ucsd.cse232b.project.xqueryParsers.xqueryParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+import sun.awt.image.ImageWatched;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 
 public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
     private HashMap<String, LinkedList<Node>> contextMap = new HashMap<>();
     private Stack<HashMap<String, LinkedList<Node>>> contextStack = new Stack<>();
-    Document outputDoc = null;
+    private LinkedList<Node> currentNodes = new LinkedList<>();
+    private Document outputDoc = null;
 
     private Document doc = null;
     boolean needRewrite = true;
@@ -547,6 +553,8 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
 
 
     @Override public LinkedList<Node> visitJoinXQ(xqueryParser.JoinXQContext ctx) { return visitChildren(ctx); }
+
+
     @Override public LinkedList<Node> visitJoinClause(xqueryParser.JoinClauseContext ctx) {
         LinkedList<Node> left = visit(ctx.xq(0));
         LinkedList<Node> right = visit(ctx.xq(1));
@@ -647,9 +655,10 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
     }
 
     @Override public LinkedList<Node> visitApXQ(xqueryParser.ApXQContext ctx) {
-        String ap = ctx.getText();
-        LinkedList<Node> results = edu.ucsd.cse232b.project.visitor.Main.evalAp(ap);
-        return results;
+//        String ap = ctx.getText();
+//        LinkedList<Node> results = edu.ucsd.cse232b.project.visitor.Main.evalAp(ap);
+//        return results;
+        return visit(ctx.ap());
     }
 
     @Override public LinkedList<Node> visitLetXQ(xqueryParser.LetXQContext ctx) {
@@ -687,19 +696,25 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
     }
 
     @Override public LinkedList<Node> visitSingleSlashXQ(xqueryParser.SingleSlashXQContext ctx) {
-        LinkedList<Node> currentNodes = new LinkedList<>();
-        copyOf(visit(ctx.xq()), currentNodes);
-        LinkedList<Node> results = edu.ucsd.cse232b.project.visitor.Main.evalRp(currentNodes, ctx.rp().getText());
-        return results;
+//        LinkedList<Node> currentNodes = new LinkedList<>();
+//        copyOf(visit(ctx.xq()), currentNodes);
+//        LinkedList<Node> results = edu.ucsd.cse232b.project.visitor.Main.evalRp(currentNodes, ctx.rp().getText());
+//        return results;
+        this.currentNodes = visit(ctx.xq());
+        return visit(ctx.rp());
     }
 
     @Override public LinkedList<Node> visitDoubleSlashXQ(xqueryParser.DoubleSlashXQContext ctx) {
-        LinkedList<Node> currentNodes = new LinkedList<>();
-        copyOf(visit(ctx.xq()), currentNodes);
-        LinkedList<Node> descendants = getDescendants(currentNodes);
-        currentNodes.addAll(descendants);
-        LinkedList<Node> results = edu.ucsd.cse232b.project.visitor.Main.evalRp(currentNodes, ctx.rp().getText());
-        return results;
+//        LinkedList<Node> currentNodes = new LinkedList<>();
+//        copyOf(visit(ctx.xq()), currentNodes);
+//        LinkedList<Node> descendants = getDescendants(currentNodes);
+//        currentNodes.addAll(descendants);
+//        LinkedList<Node> results = edu.ucsd.cse232b.project.visitor.Main.evalRp(currentNodes, ctx.rp().getText());
+//        return results;
+        visit(ctx.xq());
+        LinkedList<Node> selfOrDesc = getDescendants(this.currentNodes);
+        currentNodes = selfOrDesc;
+        return visit(ctx.rp());
     }
 
     private void copyOf(LinkedList<Node> l1, LinkedList<Node> l2){
@@ -744,10 +759,14 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
         return visit(ctx.rt());
     }
     @Override public LinkedList<Node> visitTagReturn(xqueryParser.TagReturnContext ctx) {
-        String tagName = ctx.startTag().tagName().getText();
+        String startTag = ctx.startTag().tagName().getText();
+        String endTag = ctx.endTag().tagName().getText();
+        if (!startTag.equals(endTag)) {
+            throw new RuntimeException("Tags not matching");
+        }
         LinkedList<Node> nodeList = visit(ctx.rt());
-        Node node = makeElem(tagName, nodeList);
-        LinkedList<Node> result = new  LinkedList<>();
+        Node node = makeElem(startTag, nodeList);
+        LinkedList<Node> result = new LinkedList<>();
         result.add(node);
         return result;
     }
@@ -876,9 +895,13 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
         return result;
     }
 
-    @Override public LinkedList<Node> visitStartTag(xqueryParser.StartTagContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitStartTag(xqueryParser.StartTagContext ctx) {
+        return visit(ctx.tagName());
+    }
 
-    @Override public LinkedList<Node> visitEndTag(xqueryParser.EndTagContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitEndTag(xqueryParser.EndTagContext ctx) {
+        return visit(ctx.tagName());
+    }
 
     @Override public LinkedList<Node> visitVar(xqueryParser.VarContext ctx) {
         return visitChildren(ctx);
@@ -900,47 +923,205 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
     }
     //from XPath
 
-    @Override public LinkedList<Node> visitDoubleAP(xqueryParser.DoubleAPContext ctx) {return visitChildren(ctx);}
+    @Override public LinkedList<Node> visitDoubleAP(xqueryParser.DoubleAPContext ctx) {
+        visit(ctx.doc());
+        LinkedList<Node> descendants = getDescendants(currentNodes);
+        currentNodes.addAll(descendants);
+        return visit(ctx.rp());
+    }
 
-    @Override public LinkedList<Node> visitSingleAP(xqueryParser.SingleAPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitSingleAP(xqueryParser.SingleAPContext ctx) {
+        this.visitDoc(ctx.doc());
+        return visit(ctx.rp());
+    }
 
-    @Override public LinkedList<Node> visitDoc(xqueryParser.DocContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitDoc(xqueryParser.DocContext ctx) {
+        File xmlFile = new File(ctx.filename().getText());
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setIgnoringElementContentWhitespace(true);
+        LinkedList<Node> results = new LinkedList<>();
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(xmlFile);
 
-    @Override public LinkedList<Node> visitBraceRP(xqueryParser.BraceRPContext ctx) { return visitChildren(ctx);}
+            doc.getDocumentElement().normalize();
+            this.doc = doc;
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+        }
+        results.add(this.doc);
+        this.currentNodes = results;
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitDoubleSlashRP(xqueryParser.DoubleSlashRPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitBraceRP(xqueryParser.BraceRPContext ctx) {
+        return visit(ctx.rp());
+    }
 
-    @Override public LinkedList<Node> visitTextRP(xqueryParser.TextRPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitDoubleSlashRP(xqueryParser.DoubleSlashRPContext ctx) {
+        visit(ctx.rp(0));
+        this.currentNodes = getDescendants(this.currentNodes);
+        return visit(ctx.rp(1));
+    }
 
-    @Override public LinkedList<Node> visitAttRP(xqueryParser.AttRPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitTextRP(xqueryParser.TextRPContext ctx) {
+        LinkedList<Node> results = new LinkedList<>();
+        for (Node node : getChildren(currentNodes)) {
+            if (node.getNodeType() == Node.TEXT_NODE) results.add(node);
+        }
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitParentRP(xqueryParser.ParentRPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitAttRP(xqueryParser.AttRPContext ctx) {
+        LinkedList<Node> results = new LinkedList<>();
+        for (Node node : currentNodes) {
+            if (node.getNodeType() == Node.ELEMENT_NODE && !node.getAttributes().equals("")) {
+                results.add(node);
+            }
+        }
+        currentNodes = results;
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitSelfRP(xqueryParser.SelfRPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitParentRP(xqueryParser.ParentRPContext ctx) {
+        this.currentNodes = getParents(this.currentNodes);
+        return currentNodes;
+    }
 
-    @Override public LinkedList<Node> visitFilterRP(xqueryParser.FilterRPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitSelfRP(xqueryParser.SelfRPContext ctx) {
+        return this.currentNodes;
+    }
 
-    @Override public LinkedList<Node> visitCommaRP(xqueryParser.CommaRPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitFilterRP(xqueryParser.FilterRPContext ctx) {
+        visit(ctx.rp());
+        LinkedList<Node> temp = new LinkedList<>(currentNodes);
+        LinkedList<Node> results = new LinkedList<>();
+        for (Node node : temp) {
+            currentNodes = new LinkedList<>();
+            currentNodes.add(node);
+            if (!visit(ctx.f()).isEmpty()) results.add(node);
+        }
+        currentNodes = results;
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitChildrenRP(xqueryParser.ChildrenRPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitCommaRP(xqueryParser.CommaRPContext ctx) {
+        LinkedList<Node> results;
+        LinkedList<Node> prevNodes = this.currentNodes;
+        visit(ctx.rp(0));
+        LinkedList<Node> resultsFirst = this.currentNodes;
+        currentNodes = prevNodes;
+        visit(ctx.rp(1));
+        LinkedList<Node> resultsSecond = this.currentNodes;
+        resultsFirst.addAll(resultsSecond);
+        results = resultsFirst;
+        currentNodes = results;
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitTagRP(xqueryParser.TagRPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitChildrenRP(xqueryParser.ChildrenRPContext ctx) {
+        LinkedList<Node> results = new LinkedList<>();
+        LinkedList<Node> childrenList = getChildren(this.currentNodes);
+        for (Node child : childrenList) {
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                results.add(child);
+            }
+        }
+        this.currentNodes = results;
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitSingleSlashRP(xqueryParser.SingleSlashRPContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitTagRP(xqueryParser.TagRPContext ctx) {
+        LinkedList<Node> results = new LinkedList<>();
+        LinkedList<Node> childrenList = getChildren(this.currentNodes);
+        for (Node child : childrenList) {
+            if (child.getNodeType() == Node.ELEMENT_NODE && child.getNodeName().equals(ctx.tagName().getText())) {
+                results.add(child);
+            }
+        }
+        this.currentNodes = results;
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitEqFilter(xqueryParser.EqFilterContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitSingleSlashRP(xqueryParser.SingleSlashRPContext ctx) {
+        visit(ctx.rp(0));
+        return visit(ctx.rp(1));
+    }
 
-    @Override public LinkedList<Node> visitNotFilter(xqueryParser.NotFilterContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitEqFilter(xqueryParser.EqFilterContext ctx) {
+        for (Node n1 : visit(ctx.rp(0))) {
+            for (Node n2 : visit(ctx.rp(1))) {
+                if (n1.isEqualNode(n2)) return this.currentNodes;
+            }
+        }
+        return new LinkedList<>();
+    }
 
-    @Override public LinkedList<Node> visitAndFilter(xqueryParser.AndFilterContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitNotFilter(xqueryParser.NotFilterContext ctx) {
+        LinkedList<Node> temp = new LinkedList<>(this.currentNodes);
+        LinkedList<Node> results = new LinkedList<>();
+        for (int i = 0; i < temp.size(); i++) {
+            Node node = temp.get(i);
+            this.currentNodes = new LinkedList<>();
+            this.currentNodes.add(node);
+            if (visit(ctx.f()).isEmpty()) results.add(node);
+        }
+        currentNodes = results;
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitIsFilter(xqueryParser.IsFilterContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitAndFilter(xqueryParser.AndFilterContext ctx) {
+        LinkedList<Node> temp = new LinkedList<>(this.currentNodes);
+        LinkedList<Node> results = visit(ctx.f(0));
+        this.currentNodes = temp;
+        results.retainAll(visit(ctx.f(1)));
+        this.currentNodes = results;
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitRpFilter(xqueryParser.RpFilterContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitIsFilter(xqueryParser.IsFilterContext ctx) {
+        LinkedList<Node> temp = this.currentNodes;
+        LinkedList<Node> results = new LinkedList<>();
+        for (Node node : temp) {
+            LinkedList<Node> singleCurrent = new LinkedList<>();
+            singleCurrent.add(node);
+            this.currentNodes = singleCurrent;
+            LinkedList<Node> leftList = visit(ctx.rp(0));
+            this.currentNodes = singleCurrent;
+            LinkedList<Node> rightList = visit(ctx.rp(1));
+            for (Node left : leftList) {
+                for (Node right : rightList) {
+                    if (left.isSameNode(right) & !results.contains(node))
+                        results.add(node);
+                }
+            }
+        }
+        this.currentNodes = results;
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitBraceFilter(xqueryParser.BraceFilterContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitRpFilter(xqueryParser.RpFilterContext ctx) {
+        LinkedList<Node> temp = new LinkedList<>(this.currentNodes);
+        LinkedList<Node> results = visit(ctx.rp());
+        this.currentNodes = temp;
+        return results;
+    }
 
-    @Override public LinkedList<Node> visitOrFilter(xqueryParser.OrFilterContext ctx) { return visitChildren(ctx); }
+    @Override public LinkedList<Node> visitBraceFilter(xqueryParser.BraceFilterContext ctx) {
+        LinkedList<Node> results = visit(ctx.f());
+        this.currentNodes = results;
+        return results;
+    }
+
+    @Override public LinkedList<Node> visitOrFilter(xqueryParser.OrFilterContext ctx) {
+        LinkedList<Node> temp = new LinkedList<>(currentNodes);
+        HashSet<Node> set = new HashSet<>(visit(ctx.f(0)));
+        this.currentNodes = temp;
+        set.addAll(visit(ctx.f(1)));
+        LinkedList<Node> results = new LinkedList<>(set);
+        this.currentNodes = results;
+        return results;
+    }
 
     @Override public LinkedList<Node> visitTagName(xqueryParser.TagNameContext ctx) { return visitChildren(ctx); }
 

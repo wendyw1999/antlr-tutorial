@@ -21,7 +21,7 @@
     </dependencies>
 
     <build>
-        <finalName>CSE232B_milestone_1</finalName>
+        <finalName>cse232b_milestone2</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -45,7 +45,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <mainClass>
-                                edu.ucsd.cse232b.project.visitor.Main
+                                edu.ucsd.cse232b.project.xquery.Main
                             </mainClass>
                         </manifest>
                     </archive>
@@ -82,8 +82,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <sourceDirectory>${basedir}/src/main/resources/antlr4</sourceDirectory>
-                    <outputDirectory>${basedir}/src/main/java/edu/ucsd/cse232b/project/xpathParsers</outputDirectory>
+                    <sourceDirectory>${basedir}/src/main/resources/antlr4/xquery.g4</sourceDirectory>
+                    <outputDirectory>${basedir}/src/main/java/edu/ucsd/cse232b/project/xqueryParsers</outputDirectory>
                     <visitor>true</visitor>
                 </configuration>
             </plugin>

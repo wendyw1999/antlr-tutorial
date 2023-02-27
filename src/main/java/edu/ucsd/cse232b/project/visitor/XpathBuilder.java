@@ -354,11 +354,6 @@ public class XpathBuilder extends xpathBaseVisitor<LinkedList<Node>> {
         return result;
     }
 
-    /**
-     * Rule #21
-     * @param ctx
-     * @return the not operation of a filter
-     */
     @Override
     public LinkedList<Node> visitFILTERNOT(xpathParser.FILTERNOTContext ctx) {
         LinkedList<Node> temp = new LinkedList<>(currentNodes);

@@ -19,39 +19,38 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 public class Main {
 
 
     public static void main(String[] args) throws Exception {
-//        String inputPath = "xquery.txt";
-        String inputPath = args[0];
-//        String outPath = "output.txt";
-        String outPath = args[1];
+        String inputPath = "xquery.txt";
+        String outPath = "output.txt";
         PrintWriter writer = new PrintWriter(outPath);
         writer.print("");
         writer.close();
-        String inputString = readFile(inputPath);
+        ArrayList<String> inputFile = readFile(inputPath);
 //        for (int i = 0;i<inputFile.size();i++) {
 //            evalXquery(inputFile.get(i),outPath);
 //        }
-//        String inputString = "<acts> \n" +
-//                " {\tfor $a in doc(\"j_caesar.xml\")//ACT\n" +
-//                "where empty ( for $sp in $a/SCENE/SPEECH/SPEAKER\n" +
-//                "      where $sp/text() = \"CASCA\" \n" +
-//                "      return <speaker> {$sp/text()}</speaker>)\n" +
-//                "\n" +
-//                "return <act>{$a/TITLE/text()}</act>\n" +
-//                "\n" +
-//                "        }\n" +
-//                "</acts>\n";
-//        System.out.println(inputString);
+        String inputString = "<acts> \n" +
+                " {\tfor $a in doc(\"j_caesar.xml\")//ACT\n" +
+                "where empty ( for $sp in $a/SCENE/SPEECH/SPEAKER\n" +
+                "      where $sp/text() = \"CASCA\" \n" +
+                "      return <speaker> {$sp/text()}</speaker>)\n" +
+                "\n" +
+                "return <act>{$a/TITLE/text()}</act>\n" +
+                "\n" +
+                "        }\n" +
+                "</acts>\n";
         evalXquery(inputString,outPath);
     }
 
@@ -71,13 +70,12 @@ public class Main {
             DocumentBuilder domBuilder = domFactory.newDocumentBuilder();
 
             Document newDoc = domBuilder.newDocument();
-//            Element rootElement = newDoc.createElement("RESULT");
+            Element rootElement = newDoc.createElement("RESULT");
             for (int i = 0; i < res.size(); i++) {
                 Node resultNode = newDoc.importNode(res.get(i),true);
-                newDoc.appendChild(resultNode);
-//                rootElement.appendChild(resultNode);
+                rootElement.appendChild(resultNode);
             }
-            String toWrite = toString(newDoc);
+            String toWrite = toString(rootElement);
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath,true));
             writer.write(toWrite);
             writer.close();
@@ -88,13 +86,14 @@ public class Main {
         }
     }
 
-    private static String readFile(String inputPath) throws Exception{
-        File f = new File(inputPath);
-        FileInputStream fis = new FileInputStream(f);
-        byte[] data = new byte[(int) f.length()];
-        fis.read(data);
-        fis.close();
-        return new String(data, "UTF-8");
+    private static ArrayList readFile(String inputPath) throws Exception{
+        ArrayList<String> arr = new ArrayList<>();
+        Files.lines(Paths.get(inputPath)).forEach(str ->
+                {
+                    arr.add(str);
+                }
+        );
+        return arr;
 
     }
     public static LinkedList evalRewrited(String rewrited) {

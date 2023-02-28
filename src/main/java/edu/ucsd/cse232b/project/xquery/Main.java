@@ -30,10 +30,10 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        String inputPath = "input.txt";
-//        String inputPath = args[0];
-        String outPath = "output.txt";
-//        String outPath = args[1];
+//        String inputPath = "input.txt";
+        String inputPath = args[0];
+//        String outPath = "output.txt";
+        String outPath = args[1];
         PrintWriter writer = new PrintWriter(outPath);
         writer.print("");
         writer.close();

@@ -30,28 +30,12 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-//        String inputPath = "input.txt";
         String inputPath = args[0];
-//        String outPath = "output.txt";
         String outPath = args[1];
         PrintWriter writer = new PrintWriter(outPath);
         writer.print("");
         writer.close();
         String inputString = readFile(inputPath);
-//        for (int i = 0;i<inputFile.size();i++) {
-//            evalXquery(inputFile.get(i),outPath);
-//        }
-//        String inputString = "<acts> \n" +
-//                " {\tfor $a in doc(\"j_caesar.xml\")//ACT\n" +
-//                "where empty ( for $sp in $a/SCENE/SPEECH/SPEAKER\n" +
-//                "      where $sp/text() = \"CASCA\" \n" +
-//                "      return <speaker> {$sp/text()}</speaker>)\n" +
-//                "\n" +
-//                "return <act>{$a/TITLE/text()}</act>\n" +
-//                "\n" +
-//                "        }\n" +
-//                "</acts>\n";
-//        System.out.println(inputString);
         evalXquery(inputString,outPath);
     }
 
@@ -71,11 +55,9 @@ public class Main {
             DocumentBuilder domBuilder = domFactory.newDocumentBuilder();
 
             Document newDoc = domBuilder.newDocument();
-//            Element rootElement = newDoc.createElement("RESULT");
             for (int i = 0; i < res.size(); i++) {
                 Node resultNode = newDoc.importNode(res.get(i),true);
                 newDoc.appendChild(resultNode);
-//                rootElement.appendChild(resultNode);
             }
             String toWrite = toString(newDoc);
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath,true));

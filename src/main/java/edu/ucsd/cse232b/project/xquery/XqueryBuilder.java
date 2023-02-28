@@ -60,7 +60,30 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
         return results;
     }
 
-
+        private void FLWRHelper(int k, LinkedList<Node> results, xqueryParser.FLWRContext ctx){
+        int numFor;
+        numFor = ctx.forClause().var().size();
+        if (k == numFor){
+            if (ctx.letClause() != null) visit(ctx.letClause());
+            if (ctx.whereClause() != null)
+                if (visit(ctx.whereClause()).size() == 0) return;
+            LinkedList<Node> result = visit(ctx.returnClause());
+            results.addAll(result);
+        }
+        else{
+            String key = ctx.forClause().var(k).getText();
+            LinkedList<Node> valueList = visit(ctx.forClause().xq(k));
+            for (Node node: valueList){
+                HashMap<String, LinkedList<Node>> contextMapOld = new HashMap<>(contextMap);
+                contextStack.push(contextMapOld);
+                LinkedList<Node> value = new LinkedList<>(); value.add(node);
+                contextMap.put(key, value);
+                if (k+1 <= numFor)
+                    FLWRHelper(k+1, results, ctx);
+                contextMap = contextStack.pop();
+            }
+        }
+    }
     private String reWriter(xqueryParser.FLWRContext ctx){
         //PrintWriter writer = new PrintWriter("the-file-name.txt", "UTF-8");
         String output = "";
@@ -204,6 +227,39 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
 //        w.writing("input/output.txt",output);
         return output;
     }
+
+//    @Override public LinkedList<Node> visitFLWR(xqueryParser.FLWRContext ctx) {
+//        LinkedList<Node> results = new LinkedList<>();
+//        HashMap<String, LinkedList<Node>> temp = new HashMap<>(contextMap);
+//        FLWRHelper(0, results, ctx);
+//        contextMap = temp;
+//        return results;
+//    }
+//
+//    private void FLWRHelper(int k, LinkedList<Node> results, xqueryParser.FLWRContext ctx){
+//        int numFor;
+//        numFor = ctx.forClause().var().size();
+//        if (k == numFor){
+//            if (ctx.letClause() != null) visit(ctx.letClause());
+//            if (ctx.whereClause() != null)
+//                if (visit(ctx.whereClause()) == null) return;
+//            LinkedList<Node> result = visit(ctx.returnClause());
+//            results.addAll(result);
+//        } else {
+//            String key = ctx.forClause().var(k).getText();
+//            LinkedList<Node> valueList = visit(ctx.forClause().xq(k));
+//            for (Node node: valueList){
+//                HashMap<String, LinkedList<Node>> contextMapOld = new HashMap<>(contextMap);
+//                contextStack.push(contextMapOld);
+//                LinkedList<Node> value = new LinkedList<>(); value.add(node);
+//                contextMap.put(key, value);
+////                if (k+1 <= numFor)
+//                FLWRHelper(k+1, results, ctx);
+//                contextMap = contextStack.pop();
+//            }
+//        }
+//    }
+
 
     private String PrintJoinCond(LinkedList<String> ret0, LinkedList<String> ret1, String output) {
         output += "                 [";
@@ -552,98 +608,7 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
     }
 
 
-    @Override public LinkedList<Node> visitJoinXQ(xqueryParser.JoinXQContext ctx) { return visitChildren(ctx); }
 
-
-    @Override public LinkedList<Node> visitJoinClause(xqueryParser.JoinClauseContext ctx) {
-        LinkedList<Node> left = visit(ctx.xq(0));
-        LinkedList<Node> right = visit(ctx.xq(1));
-        int idSize = ctx.idList(0).ID().size();
-        String [] idListLeft = new String [idSize];
-        String [] idListRight = new String [idSize];
-        for (int i = 0; i < idSize; i++){
-            idListLeft[i] = ctx.idList(0).ID(i).getText();
-            idListRight[i] = ctx.idList(1).ID(i).getText();
-        }
-        HashMap<String, LinkedList<Node>> hashMapOnLeft = buildHashTable(left, idListLeft);
-        LinkedList<Node> result = probeJoin(hashMapOnLeft, right, idListLeft, idListRight);
-
-        return result;
-    }
-    private LinkedList<Node> probeJoin(HashMap<String, LinkedList<Node>> hashMapOnLeft, LinkedList<Node> right, String [] idListLeft, String []idListRight){
-        LinkedList<Node> result = new LinkedList<>();
-        for (Node tuple: right){
-            LinkedList<Node> children = getChildren(tuple);
-            String key = "";
-            for (String hashAtt: idListRight) {
-                for (Node child: children){
-                    if (hashAtt.equals(child.getNodeName())) {
-                        key += child.getFirstChild().getTextContent();
-                    }
-                }
-            }
-
-            if (hashMapOnLeft.containsKey(key))
-                result.addAll(product(hashMapOnLeft.get(key),tuple));
-        }
-        return result;
-    }
-    private LinkedList<Node> product(LinkedList<Node> leftList, Node right){
-        LinkedList<Node> result = new LinkedList<>();
-        for (Node left: leftList){
-            LinkedList<Node> newTupleChildren = getChildren(left);
-            newTupleChildren.addAll(getChildren(right));
-            result.add(makeElem("tuple", newTupleChildren));
-        }
-        return result;
-    }
-
-    private HashMap buildHashTable(LinkedList<Node> tupleList, String [] hashAtts){
-        HashMap<String, LinkedList<Node>> result = new HashMap<>();
-        for (Node tuple: tupleList){
-            LinkedList<Node> children = getChildren(tuple);
-            String key = "";
-            for (String hashAtt: hashAtts) {
-                for (Node child: children){
-                    if (hashAtt.equals(child.getNodeName()))
-                        key += child.getFirstChild().getTextContent();
-                }
-            }
-            if (result.containsKey(key))
-                result.get(key).add(tuple);
-            else{
-                LinkedList<Node> value = new LinkedList<>();
-                value.add(tuple);
-                result.put(key, value);
-            }
-        }
-        return result;
-    }
-
-    private void FLWRHelper(int k, LinkedList<Node> results, xqueryParser.FLWRContext ctx){
-        int numFor;
-        numFor = ctx.forClause().var().size();
-        if (k == numFor){
-            if (ctx.letClause() != null) visit(ctx.letClause());
-            if (ctx.whereClause() != null)
-                if (visit(ctx.whereClause()).size() == 0) return;
-            LinkedList<Node> result = visit(ctx.returnClause());
-            results.addAll(result);
-        }
-        else{
-            String key = ctx.forClause().var(k).getText();
-            LinkedList<Node> valueList = visit(ctx.forClause().xq(k));
-            for (Node node: valueList){
-                HashMap<String, LinkedList<Node>> contextMapOld = new HashMap<>(contextMap);
-                contextStack.push(contextMapOld);
-                LinkedList<Node> value = new LinkedList<>(); value.add(node);
-                contextMap.put(key, value);
-                if (k+1 <= numFor)
-                    FLWRHelper(k+1, results, ctx);
-                contextMap = contextStack.pop();
-            }
-        }
-    }
     @Override public LinkedList<Node> visitTagXQ(xqueryParser.TagXQContext ctx) {
 
         String tagName = ctx.startTag().tagName().getText();
@@ -712,8 +677,7 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
 //        LinkedList<Node> results = edu.ucsd.cse232b.project.visitor.Main.evalRp(currentNodes, ctx.rp().getText());
 //        return results;
         visit(ctx.xq());
-        LinkedList<Node> selfOrDesc = getDescendants(this.currentNodes);
-        currentNodes = selfOrDesc;
+        currentNodes = getDescendants(this.currentNodes);
         return visit(ctx.rp());
     }
 

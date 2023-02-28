@@ -30,10 +30,10 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-//        String inputPath = "xquery.txt";
-        String inputPath = args[0];
-//        String outPath = "output.txt";
-        String outPath = args[1];
+        String inputPath = "input.txt";
+//        String inputPath = args[0];
+        String outPath = "output.txt";
+//        String outPath = args[1];
         PrintWriter writer = new PrintWriter(outPath);
         writer.print("");
         writer.close();
@@ -97,28 +97,7 @@ public class Main {
         return new String(data, "UTF-8");
 
     }
-    public static LinkedList evalRewrited(String rewrited) {
-        try {
-            ANTLRInputStream input = new ANTLRInputStream(rewrited);
-            xqueryLexer lexer = new xqueryLexer(input);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            xqueryParser parser = new xqueryParser(tokens);
-            parser.removeErrorListeners();
-            ParseTree tree = parser.xq();
 
-            //for Visitor
-            XqueryBuilder visitor = new XqueryBuilder();
-            visitor.needRewrite = false;
-            LinkedList<Node> results = visitor.visit(tree);
-            return results;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Error: " + e.getMessage());
-        }
-        return null;
-
-    }
     private static String toString(Node node) {
         StringWriter sw = new StringWriter();
         try {

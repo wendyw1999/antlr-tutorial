@@ -48,6 +48,18 @@ public class Main {
         final  LinkedList<Node> results = xqueryBuilder.visit(tree);
         writeToFile(results, outPath);
     }
+
+    public static LinkedList evalRewrited(String rewrited) {
+        final xqueryLexer lexer = new xqueryLexer(CharStreams.fromString(rewrited));
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        final xqueryParser parser = new xqueryParser(tokens);
+        final ParseTree tree = parser.xq();
+        final XqueryBuilder xqueryBuilder = new XqueryBuilder();
+        xqueryBuilder.needRewrite = false;
+        final LinkedList<Node> results = xqueryBuilder.visit(tree);
+        return results;
+    }
+
     public static void writeToFile(LinkedList<Node> res, String filePath) {
 
         try {

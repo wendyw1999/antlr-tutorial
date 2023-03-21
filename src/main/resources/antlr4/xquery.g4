@@ -12,8 +12,10 @@ xq : var                                                   #varXQ
    | xq '//' rp                                            #doubleSlashXQ
    | forClause letClause? whereClause? returnClause        #FLWR
    | letClause xq                                          #letXQ
+   | joinClause                                            #joinXQ
    ;
 
+joinClause : 'join' '(' xq ',' xq ',' idList ',' idList ')';
 forClause : 'for' var 'in' xq (',' var 'in' xq)* ;
 letClause : 'let' var ':=' xq (',' var ':=' xq)* ;
 whereClause : 'where' cond ;

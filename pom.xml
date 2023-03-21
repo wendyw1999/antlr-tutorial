@@ -21,7 +21,7 @@
     </dependencies>
 
     <build>
-        <finalName>cse232b_milestone2</finalName>
+        <finalName>cse232b_milestone3</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -53,7 +53,6 @@ public class XqueryBuilder extends xqueryBaseVisitor<LinkedList<Node>> {
         } else {
             FLWRHelper(0, results, ctx);
         }
-        FLWRHelper(0, results, ctx);
         contextMap = contextStack.pop();
         return results;
     }

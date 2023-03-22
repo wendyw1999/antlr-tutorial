@@ -45,7 +45,11 @@ public class Main {
         final xqueryParser parser = new xqueryParser(tokens);
         final ParserRuleContext tree = parser.xq();
         final XqueryBuilder xqueryBuilder = new XqueryBuilder();
-        final  LinkedList<Node> results = xqueryBuilder.visit(tree);
+        final LinkedList<Node> results = xqueryBuilder.visit(tree);
+        for (int i = 0; i < results.size(); i++) {
+            System.out.println(results.get(0));
+        }
+//        System.out.println(results);
         writeToFile(results, outPath);
     }
 

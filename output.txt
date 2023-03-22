@@ -1,7 +1,112 @@
 <result>
-<who>CAESAR</who>
-<when>
-<act>ACT III</act>
-<scene>SCENE I.  Rome. Before the Capitol; the Senate sitting above.</scene>
-</when>
+<triplet>
+<title>answer 0</title>
+<title>answer 0</title>
+<title>answer 0</title>
+</triplet>
+<triplet>
+<title>answer 2</title>
+<title>answer 0</title>
+<title>answer 0</title>
+</triplet>
+<triplet>
+<title>answer 0</title>
+<title>answer 2</title>
+<title>answer 0</title>
+</triplet>
+<triplet>
+<title>answer 2</title>
+<title>answer 2</title>
+<title>answer 0</title>
+</triplet>
+<triplet>
+<title>answer 1</title>
+<title>answer 1</title>
+<title>answer 1</title>
+</triplet>
+<triplet>
+<title>answer 3</title>
+<title>answer 1</title>
+<title>answer 1</title>
+</triplet>
+<triplet>
+<title>answer 1</title>
+<title>answer 3</title>
+<title>answer 1</title>
+</triplet>
+<triplet>
+<title>answer 3</title>
+<title>answer 3</title>
+<title>answer 1</title>
+</triplet>
+<triplet>
+<title>answer 0</title>
+<title>answer 0</title>
+<title>answer 2</title>
+</triplet>
+<triplet>
+<title>answer 2</title>
+<title>answer 0</title>
+<title>answer 2</title>
+</triplet>
+<triplet>
+<title>answer 0</title>
+<title>answer 2</title>
+<title>answer 2</title>
+</triplet>
+<triplet>
+<title>answer 2</title>
+<title>answer 2</title>
+<title>answer 2</title>
+</triplet>
+<triplet>
+<title>answer 1</title>
+<title>answer 1</title>
+<title>answer 3</title>
+</triplet>
+<triplet>
+<title>answer 3</title>
+<title>answer 1</title>
+<title>answer 3</title>
+</triplet>
+<triplet>
+<title>answer 1</title>
+<title>answer 3</title>
+<title>answer 3</title>
+</triplet>
+<triplet>
+<title>answer 3</title>
+<title>answer 3</title>
+<title>answer 3</title>
+</triplet>
+<triplet>
+<title>O7SUNM</title>
+<title>O7SUNM</title>
+<title>O7SUNM</title>
+</triplet>
+<triplet>
+<title>K39SXL</title>
+<title>K39SXL</title>
+<title>K39SXL</title>
+</triplet>
+<triplet>
+<title>7Z1XEV</title>
+<title>7Z1XEV</title>
+<title>7Z1XEV</title>
+</triplet>
+<triplet>
+<title>V3VLAY</title>
+<title>V3VLAY</title>
+<title>V3VLAY</title>
+</triplet>
+<triplet>
+<title>2YAI2O</title>
+<title>2YAI2O</title>
+<title>2YAI2O</title>
+</triplet>
+<triplet>
+<title>0IQ8UU</title>
+<title>0IQ8UU</title>
+<title>0IQ8UU</title>
+</triplet>
 </result>

@@ -2,13 +2,11 @@ package edu.ucsd.cse232b.project.xquery;
 
 import edu.ucsd.cse232b.project.xqueryParsers.xqueryLexer;
 import edu.ucsd.cse232b.project.xqueryParsers.xqueryParser;
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
